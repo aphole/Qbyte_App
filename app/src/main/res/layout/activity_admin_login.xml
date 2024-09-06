@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    tools:context=".UserLoginActivity">
+
+    <ImageView
+        android:id="@+id/qbyteLogo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:contentDescription="@string/logoImg"
+        android:src="@drawable/qbyte_logo" />
+
+    <TextView
+        android:id="@+id/userText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/qbyteLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:gravity="center"
+        android:text="@string/admin_text"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/userLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        android:contentDescription="@string/loginImg"
+        android:src="@drawable/user_login_logo" />
+
+    <EditText
+        android:id="@+id/emailInput"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/userLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:background="@drawable/input_bg"
+        android:hint="@string/email"
+        android:inputType="textEmailAddress"
+        android:textColorHint="@color/black" />
+
+    <EditText
+        android:id="@+id/passwordInput"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/emailInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/input_bg"
+        android:hint="@string/password"
+        android:inputType="textPassword"
+        android:textColorHint="@color/black" />
+
+    <Button
+        android:id="@+id/adminLoginButton"
+        android:layout_width="203dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/passwordInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/orange_button_bg"
+        android:text="@string/loginButton"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/adminLoginButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Don't have an account? Sign up" />
+
+</RelativeLayout>
