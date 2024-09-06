@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    tools:context=".SplashActivity">
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:src="@drawable/roundedbackround"
+        android:id="@+id/roundedBackground" />
+
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:src="@drawable/qbyte_logo"
+        android:layout_marginTop="10dp"
+        android:id="@+id/qbyteLogo" />
+
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome"
+        android:textColor="@color/black"
+        android:gravity="center"
+        android:layout_below="@id/qbyteLogo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:textSize="40sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.2"/>
+
+    <ImageView
+        android:id="@+id/startLogo"
+        android:layout_width="250dp"
+        android:layout_height="300dp"
+        android:layout_below="@id/welcomeText"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="73dp"
+        android:layout_marginTop="27dp"
+        android:layout_marginEnd="73dp"
+        app:srcCompat="@drawable/logo" />
+
+    <Button
+        android:id="@+id/userButton"
+        android:layout_width="266dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="User"
+        android:textColor="@color/orange"
+        android:background="@drawable/start_button_user_bg"
+        android:layout_below="@+id/startLogo"
+        android:layout_centerHorizontal="true"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"/>
+
+    <Button
+        android:id="@+id/adminButton"
+        android:layout_width="266dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Admin"
+        android:textColor="@color/white"
+        android:background="@drawable/start_button_admin_bg"
+        android:layout_centerHorizontal="true"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:textAllCaps="false"
+        android:layout_below="@id/userButton"
+        />
+
+
+
+</RelativeLayout>

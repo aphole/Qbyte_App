@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    tools:context=".UserLoginActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/qbyte_logo"
+        android:id="@+id/qbyte_logo"
+        android:layout_marginTop="52dp"
+        />
+
+    <TextView
+        android:id="@+id/userText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="User"
+        android:layout_below="@+id/qbyte_logo"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:layout_marginTop="70dp"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+
+    <ImageView
+        android:id="@+id/userLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/userText"
+        android:src="@drawable/user_login_logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="70dp"
+        />
+
+    <EditText
+        android:id="@+id/emailInput"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:text="Enter your email"
+        android:layout_below="@+id/userLogo"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/input_bg"
+        android:layout_marginTop="45dp"
+        />
+
+    <EditText
+        android:id="@+id/passwordInput"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:text="Enter password"
+        android:layout_below="@+id/emailInput"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/input_bg"
+        android:layout_marginTop="35dp"
+        />
+
+    <Button
+        android:layout_width="203dp"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:layout_below="@+id/passwordInput"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:textColor="@color/white"
+        android:textAllCaps="false"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:background="@drawable/orange_button_bg"/>
+
+</RelativeLayout>
