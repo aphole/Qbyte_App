@@ -24,26 +24,32 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="70dp"
         android:gravity="center"
-        android:text="@string/admin_text"
+        android:text="@string/create_user_account"
         android:textColor="@color/black"
         android:textSize="32sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:letterSpacing=".2"/>
 
-    <ImageView
-        android:id="@+id/userLogo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/userText"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="70dp"
-        android:contentDescription="@string/loginImg"
-        android:src="@drawable/user_login_logo" />
 
     <EditText
-        android:id="@+id/adminEmail"
+        android:id="@+id/userName"
         android:layout_width="312dp"
         android:layout_height="50dp"
-        android:layout_below="@+id/userLogo"
+        android:layout_below="@+id/userText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="45dp"
+        android:autofillHints="admin-name"
+        android:background="@drawable/input_bg"
+        android:hint="@string/enter_your_fullname"
+        android:inputType="text"
+        android:textColorHint="@color/black"
+        />
+
+    <EditText
+        android:id="@+id/userEmail"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/userName"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="45dp"
         android:background="@drawable/input_bg"
@@ -53,10 +59,10 @@
         android:autofillHints="email"/>
 
     <EditText
-        android:id="@+id/adminPass"
+        android:id="@+id/userPass"
         android:layout_width="312dp"
         android:layout_height="50dp"
-        android:layout_below="@+id/adminEmail"
+        android:layout_below="@+id/userEmail"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
         android:background="@drawable/input_bg"
@@ -65,35 +71,32 @@
         android:textColorHint="@color/black"
         android:autofillHints="password"/>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/adminPass"
-        android:layout_centerHorizontal="true"/>
+    <EditText
+        android:id="@+id/confirmPass"
+        android:layout_width="312dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/userPass"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/input_bg"
+        android:hint="@string/confirm_password"
+        android:inputType="textPassword"
+        android:textColorHint="@color/black"
+        android:autofillHints="password"/>
 
     <Button
-        android:id="@+id/adminLoginButton"
+        android:id="@+id/userRegisterButton"
         android:layout_width="203dp"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/adminPass"
+        android:layout_below="@+id/confirmPass"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
         android:background="@drawable/orange_button_bg"
-        android:text="@string/loginButton"
+        android:text="@string/register"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="25sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/registerNow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/adminLoginButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="@string/don_t_have_an_account" />
 
 </RelativeLayout>

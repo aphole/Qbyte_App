@@ -1,0 +1,192 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ash"
+    tools:context=".AdminDashboardActivity">
+
+    <!-- Rounded Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:src="@drawable/roundedbackround"
+        android:id="@+id/roundedBackground" />
+
+    <!-- Logo -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:src="@drawable/qbyte_logo"
+        android:layout_marginTop="10dp"
+        android:id="@+id/qbyteLogo"
+        />
+
+    <!-- Logout Button -->
+    <ImageView
+        android:id="@+id/logout"
+        android:src="@drawable/admin_logout_icon"
+        android:textColor="@color/white"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/qbyteLogo"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="16dp"/>
+
+    <!-- User Details -->
+    <TextView
+        android:id="@+id/user_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello Admin"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/logout"
+        android:layout_marginTop="50dp"
+        android:textSize="18sp"
+        />
+
+    <!-- Grid Layout for 4 Modules (2x2 Grid) -->
+    <androidx.gridlayout.widget.GridLayout
+        android:id="@+id/dashboardGrid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:layout_below="@id/logout"
+        android:padding="20dp"
+        android:layout_gravity="center"
+        app:alignmentMode="alignMargins"
+        app:orientation="horizontal"
+        app:rowCount="2"
+        app:columnCount="2">
+
+        <!-- Module 1 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/module_member_info"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="20dp"
+            app:layout_columnWeight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/module_bg">
+
+                <ImageView
+                    android:layout_width="85dp"
+                    android:layout_height="76.5dp"
+                    android:src="@drawable/member_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Member Information"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Module 2 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/module_notifications"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="20dp"
+            app:layout_columnWeight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/module_bg">
+
+                <ImageView
+                    android:layout_width="85dp"
+                    android:layout_height="65.5dp"
+                    android:src="@drawable/notif_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Module 3 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/module_activity_logs"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="20dp"
+            app:layout_columnWeight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/module_bg">
+
+                <ImageView
+                    android:layout_width="85dp"
+                    android:layout_height="59.51dp"
+                    android:src="@drawable/act_log_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Activity Logs"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Module 4 -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/module_create_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="20dp"
+            app:layout_columnWeight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/module_bg">
+
+                <ImageView
+                    android:layout_width="85dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/add_user_icon" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Create User Account"
+                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.gridlayout.widget.GridLayout>
+
+</RelativeLayout>

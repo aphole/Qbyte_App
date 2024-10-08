@@ -6,4 +6,16 @@
     <string name="loginButton">Login</string>
     <string name="loginImg">imgLogin</string>
     <string name="logoImg">imgLogo</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="create_admin_account">Create Admin Account</string>
+    <string name="enter_your_full_name">Enter your full name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="logout">Logout</string>
+    <string name="admin">Admin</string>
+    <string name="user">User</string>
+    <string name="welcome">Welcome</string>
+    <string name="create_user_account">Create User Account</string>
+    <string name="register">Register</string>
+    <string name="enter_your_fullname">Enter your fullname</string>
 </resources>

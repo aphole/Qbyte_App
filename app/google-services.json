@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "348557191494",
+    "project_id": "qbyte-app-2f941",
+    "storage_bucket": "qbyte-app-2f941.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348557191494:android:7fe05cbcf41d271ca9dd47",
+        "android_client_info": {
+          "package_name": "com.example.qbyte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXeAxDY3Ra0M57G88hcyMtLyQLaZZXNFQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,6 +13,18 @@
         android:theme="@style/Theme.QByte"
         tools:targetApi="31">
         <activity
+            android:name=".UserDashboardActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserRegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminRegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminDashboardActivity"
+            android:exported="true" />
+        <activity
             android:name=".AdminLoginActivity"
             android:exported="false" />
         <activity

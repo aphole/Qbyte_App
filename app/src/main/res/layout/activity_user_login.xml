@@ -44,7 +44,7 @@
         android:id="@+id/emailInput"
         android:layout_width="312dp"
         android:layout_height="50dp"
-        android:text="Enter your email"
+        android:hint="@string/email"
         android:layout_below="@+id/userLogo"
         android:layout_centerHorizontal="true"
         android:background="@drawable/input_bg"
@@ -55,18 +55,29 @@
         android:id="@+id/passwordInput"
         android:layout_width="312dp"
         android:layout_height="50dp"
-        android:text="Enter password"
+        android:hint="@string/password"
         android:layout_below="@+id/emailInput"
         android:layout_centerHorizontal="true"
         android:background="@drawable/input_bg"
         android:layout_marginTop="35dp"
+        android:inputType="textPassword"
         />
 
+    <ProgressBar
+        android:id="@+id/progress_Bar"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/passwordInput"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"/>
+
     <Button
+        android:id="@+id/loginButton"
         android:layout_width="203dp"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:layout_below="@+id/passwordInput"
+        android:layout_below="@+id/progress_Bar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="35dp"
         android:textColor="@color/white"

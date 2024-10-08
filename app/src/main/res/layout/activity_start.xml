@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background1"
-    tools:context=".SplashActivity">
+    tools:context=".StartActivity">
 
 
     <ImageView
@@ -27,7 +27,7 @@
         android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome"
+        android:text="@string/welcome"
         android:textColor="@color/black"
         android:gravity="center"
         android:layout_below="@id/qbyteLogo"
@@ -54,7 +54,7 @@
         android:layout_width="266dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="User"
+        android:text="@string/user"
         android:textColor="@color/orange"
         android:background="@drawable/start_button_user_bg"
         android:layout_below="@+id/startLogo"
@@ -68,7 +68,7 @@
         android:layout_width="266dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
-        android:text="Admin"
+        android:text="@string/admin"
         android:textColor="@color/white"
         android:background="@drawable/start_button_admin_bg"
         android:layout_centerHorizontal="true"
