@@ -1,32 +1,24 @@
 package com.example.qbyte;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class UserAccountActivity extends AppCompatActivity {
 
-    private ImageView profilePicture;
-    private TextView changeProfileButton, fullName, email, accountCreatedDate;
+    private TextView fullName, email, accountCreatedDate;
     private Button logoutButton;
 
     FirebaseAuth auth;
     FirebaseFirestore db;
-
-    // Declare ActivityResultLauncher for image picking
-    private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +30,6 @@ public class UserAccountActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         // Initialize views
-        profilePicture = findViewById(R.id.profile_picture);
-        changeProfileButton = findViewById(R.id.change_profile_button);
         fullName = findViewById(R.id.full_name);
         email = findViewById(R.id.email);
         accountCreatedDate = findViewById(R.id.account_created_date);
@@ -48,21 +38,6 @@ public class UserAccountActivity extends AppCompatActivity {
         // Set initial user data (from Firebase Authentication)
         setUserData();
 
-        // Initialize the ActivityResultLauncher for picking an image
-        imagePickerLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Uri selectedImageUri = result.getData().getData();
-                        if (selectedImageUri != null) {
-                            profilePicture.setImageURI(selectedImageUri); // Set the selected image as the profile picture
-                        }
-                    }
-                }
-        );
-
-        // Set onClickListener for the change profile button
-        changeProfileButton.setOnClickListener(v -> openImageChooser());
 
         // Set onClickListener for logout button
         logoutButton.setOnClickListener(v -> {
@@ -73,21 +48,24 @@ public class UserAccountActivity extends AppCompatActivity {
         });
     }
 
-    // Method to open image chooser
-    private void openImageChooser() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        imagePickerLauncher.launch(intent);
-    }
-
     // Fetch and set user data from Firebase Auth and Firestore
     private void setUserData() {
         FirebaseUser user = auth.getCurrentUser();
 
         if (user != null) {
-            // Set email and account creation date
+            // Set email
             email.setText("Email: " + user.getEmail());
-            accountCreatedDate.setText("Account Created: " + user.getMetadata().getCreationTimestamp());
+
+            // Convert creation timestamp to Date
+            long creationTimestamp = user.getMetadata().getCreationTimestamp();
+            Date creationDate = new Date(creationTimestamp);
+
+            // Format the Date to show Day, Month, and Year
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy", Locale.getDefault());
+            String formattedDate = dateFormat.format(creationDate);
+
+            // Set account creation date
+            accountCreatedDate.setText("Account Created: " + formattedDate);
 
             // Fetch additional user data from Firestore
             String uid = user.getUid();
