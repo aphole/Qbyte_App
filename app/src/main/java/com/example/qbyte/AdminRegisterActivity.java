@@ -28,6 +28,8 @@ public class AdminRegisterActivity extends AppCompatActivity {
     private EditText adminName, emailInput, passwordInput, confirmPass;
     private Button adminRegisterBtn;
 
+    TextView adminLogin;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +43,14 @@ public class AdminRegisterActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.passwordInput);
         confirmPass = findViewById(R.id.confirmPass);
         adminRegisterBtn = findViewById(R.id.adminRegisterButton);
+        adminLogin = findViewById(R.id.loginNow);
+
+        // Redirect to Admin Login
+        adminLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(getApplicationContext(), AdminLoginActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         adminRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override

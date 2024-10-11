@@ -22,6 +22,16 @@
         android:id="@+id/qbyteLogo"
         />
 
+    <ImageView
+        android:id="@+id/aboutUs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/about_icon"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        android:layout_below="@id/qbyteLogo"
+        android:layout_marginTop="20dp"/>
+
     <!-- User Details -->
     <TextView
         android:id="@+id/user_details"
@@ -29,7 +39,7 @@
         android:layout_height="wrap_content"
         android:text="Hello User"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/qbyteLogo"
+        android:layout_below="@id/aboutUs"
         android:layout_marginTop="50dp"
         android:textSize="18sp"
         />
@@ -40,7 +50,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/user_details"
-      android:layout_marginTop="100dp"
+      android:layout_marginTop="80dp"
       android:layout_centerHorizontal="true"
       android:thumb="@drawable/thumb"
       app:track="@drawable/switch_bg"
@@ -50,7 +60,7 @@
         android:id="@+id/dashboardGrid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
+        android:layout_marginTop="100dp"
         android:layout_below="@id/switchButton"
         android:padding="5dp"
         android:layout_gravity="center"
@@ -70,7 +80,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="130dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="@drawable/module_bg">
@@ -102,7 +112,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="130dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="@drawable/module_bg">
@@ -134,7 +144,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="140dp"
+                android:layout_height="130dp"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="@drawable/module_bg">

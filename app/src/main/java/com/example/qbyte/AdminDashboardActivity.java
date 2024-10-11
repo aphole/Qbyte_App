@@ -51,7 +51,6 @@ public class AdminDashboardActivity extends AppCompatActivity {
         createUserCard.setOnClickListener(v -> {
             Intent intent = new Intent(AdminDashboardActivity.this, UserRegisterActivity.class);
             startActivity(intent);
-            finish();
         });
     }
 }

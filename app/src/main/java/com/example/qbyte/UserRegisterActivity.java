@@ -5,9 +5,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -21,17 +23,19 @@ public class UserRegisterActivity extends AppCompatActivity {
     FirebaseFirestore db;
     EditText userName, userEmail, userPass, confirmPass;
     Button userRegisterBtn;
+    FirebaseUser currentAdminUser;  // Variable to store the current admin user
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Set the content view to the layout file (activity_user_register.xml)
         setContentView(R.layout.activity_user_register);
 
-        // Initialize Firebase authentication and Firestore database
+        // Initialize Firebase Authentication and Firestore database
         auth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
+        // Store the current admin user before creating a new user
+        currentAdminUser = auth.getCurrentUser();
 
         // Initialize views
         userName = findViewById(R.id.userName);
@@ -58,36 +62,66 @@ public class UserRegisterActivity extends AppCompatActivity {
             return; // Exit the method if passwords do not match
         }
 
-        // Firebase Authentication logic
-        auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // User registration successful
-                        FirebaseUser user = auth.getCurrentUser();
+        // Save admin token before creating new user
+        if (currentAdminUser != null) {
+            currentAdminUser.getIdToken(true)
+                    .addOnSuccessListener(getTokenResult -> {
+                        String adminToken = getTokenResult.getToken();  // Save this token
 
-                        // Create user data to store in Firestore
-                        Map<String, Object> userData = new HashMap<>();
-                        userData.put("fullName", name);
-                        userData.put("email", email);
-                        userData.put("isAdmin", false);  // Mark as a regular user
+                        // Proceed to create the new user
+                        auth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(this, task -> {
+                                    if (task.isSuccessful()) {
+                                        // New user created successfully
+                                        FirebaseUser newUser = auth.getCurrentUser();
 
-                        // Store the user's data in Firestore
-                        assert user != null;
-                        db.collection("users")
-                                .document(user.getUid())
-                                .set(userData)
-                                .addOnSuccessListener(aVoid -> {
-                                    Log.d("Firestore", "User data successfully written!");
-                                    // Redirect regular user to User Dashboard
-                                    Intent intent = new Intent(getApplicationContext(), UserDashboardActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                })
-                                .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
-                    } else {
-                        // If registration fails, log the error
-                        Log.w("FirebaseAuth", "createUserWithEmail:failure", task.getException());
-                    }
-                });
+                                        // Create user data to store in Firestore
+                                        Map<String, Object> userData = new HashMap<>();
+                                        userData.put("fullName", name);
+                                        userData.put("email", email);
+                                        userData.put("isAdmin", false);  // Mark as a regular user
+
+                                        // Store the user's data in Firestore
+                                        assert newUser != null;
+                                        db.collection("users")
+                                                .document(newUser.getUid())
+                                                .set(userData)
+                                                .addOnSuccessListener(aVoid -> {
+                                                    Log.d("Firestore", "User data successfully written!");
+
+                                                    // Re-authenticate admin using the token
+                                                    reAuthenticateAdmin(adminToken);
+                                                })
+                                                .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
+                                    } else {
+                                        // If registration fails, log the error
+                                        Log.w("FirebaseAuth", "createUserWithEmail:failure", task.getException());
+                                        Toast.makeText(UserRegisterActivity.this, "User registration failed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    });
+        }
     }
+
+    // Method to re-authenticate the admin user using their token
+    private void reAuthenticateAdmin(String adminToken) {
+        if (adminToken != null) {
+            // Reload the admin user to restore the session
+            currentAdminUser.reload()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            // Admin session restored, redirect to admin dashboard
+                            Intent intent = new Intent(getApplicationContext(), AdminDashboardActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Log.w("FirebaseAuth", "Admin session restore failed", task.getException());
+                            Toast.makeText(UserRegisterActivity.this, "Failed to restore admin session", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            Log.w("FirebaseAuth", "Admin token is null");
+        }
+    }
+
 }

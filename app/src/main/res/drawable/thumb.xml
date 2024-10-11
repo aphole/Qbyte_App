@@ -1,19 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:state_checked="true">
-        <shape android:shape="oval">
-            <solid android:color="@color/orange" />
-            <size android:height="50dp" android:width="50dp"/>
-        </shape>
-    </item>
+    <item android:state_checked="true"
+        android:drawable="@drawable/thumb_switch"/>
 
-    <item android:state_checked="false">
-        <shape android:shape="oval">
-            <solid android:color="@color/orange" />
-            <size android:height="50dp" android:width="50dp"/>
-        </shape>
-    </item>
+
+
+    <item android:state_checked="false"
+        android:drawable="@drawable/thumb_switch"/>
+
 
 
 </selector>
