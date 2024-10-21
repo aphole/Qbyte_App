@@ -1,6 +1,8 @@
 package com.example.qbyte;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,17 +10,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MemberInfoActivity extends AppCompatActivity {
+public class MemberInfoActivity extends AppCompatActivity implements UserAdapter.OnUserBlockListener {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private TabLayout tabLayout;
     private List<User> allUsers; // List to hold all users
     private List<User> blockedUsers; // List to hold blocked users
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,22 +31,25 @@ public class MemberInfoActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_member_info);
 
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+
         // Initialize views
         recyclerView = findViewById(R.id.recyclerView);
         tabLayout = findViewById(R.id.tabLayout);
 
-        // Initialize user lists (replace with actual data fetching logic)
-        allUsers = fetchAllUsers();
-        blockedUsers = fetchBlockedUsers();
+        // Initialize user lists
+        allUsers = new ArrayList<>();
+        blockedUsers = new ArrayList<>();
 
         // Set up RecyclerView
-        userAdapter = new UserAdapter(allUsers); // Start with all users
+        userAdapter = new UserAdapter(allUsers, this, this); // Pass context and block listener
         recyclerView.setAdapter(userAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Add tabs programmatically
-        tabLayout.addTab(tabLayout.newTab().setText("Members").setContentDescription("All Users Tab"));
-        tabLayout.addTab(tabLayout.newTab().setText("Blocked").setContentDescription("Blocked Users Tab"));
+        // Fetch users from Firestore
+        fetchAllUsers();
+        fetchBlockedUsers();
 
         // Add tab selection listener
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -62,28 +70,78 @@ public class MemberInfoActivity extends AppCompatActivity {
             @Override
             public void onTabReselected(TabLayout.Tab tab) {}
         });
-
-        // Load all users by default
-        loadAllUsers();
     }
 
-    private void loadAllUsers() {
-        // Logic to load all users into the RecyclerView
-        userAdapter.updateUserList(allUsers);
+    private void fetchAllUsers() {
+        db.collection("users")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null) {
+                        Log.w("Firestore", "Listen failed.", e);
+                        return;
+                    }
+
+                    allUsers.clear(); // Clear the list to avoid duplication
+                    assert queryDocumentSnapshots != null;
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String name = document.getString("name");
+                        String email = document.getString("email");
+                        boolean isBlocked = document.getBoolean("isBlocked") != null && document.getBoolean("isBlocked");
+                        allUsers.add(new User(name, email, isBlocked));
+                    }
+
+                    // Update the adapter if "All Users" tab is active
+                    if (tabLayout.getSelectedTabPosition() == 0) {
+                        userAdapter.updateUserList(allUsers);
+                    }
+                });
     }
 
-    private void loadBlockedUsers() {
-        // Logic to load blocked users into the RecyclerView
-        userAdapter.updateUserList(blockedUsers);
+    private void fetchBlockedUsers() {
+        db.collection("users")
+                .addSnapshotListener((queryDocumentSnapshots, e) -> {
+                    if (e != null) {
+                        Log.w("Firestore", "Listen failed.", e);
+                        return;
+                    }
+
+                    blockedUsers.clear(); // Clear the list to avoid duplication
+                    assert queryDocumentSnapshots != null;
+                    for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                        String name = document.getString("name");
+                        String email = document.getString("email");
+                        boolean isBlocked = document.getBoolean("isBlocked") != null && document.getBoolean("isBlocked");
+                        if (isBlocked) {
+                            blockedUsers.add(new User(name, email, true));
+                        }
+                    }
+
+                    // Update the adapter if "Blocked Users" tab is active
+                    if (tabLayout.getSelectedTabPosition() == 1) {
+                        userAdapter.updateUserList(blockedUsers);
+                    }
+                });
     }
 
-    private List<User> fetchAllUsers() {
-        // Dummy method to simulate fetching users from a database
-        return new ArrayList<>(); // Replace with actual data fetching
+    // Implement the onBlockUser method from OnUserBlockListener
+    @Override
+    public void onBlockUser(User user) {
+        // Logic to block/unblock user
+        boolean newBlockedStatus = !user.isBlocked(); // Toggle the blocked status
+        // Update Firestore document for the user here
+        db.collection("users")
+                .document(user.getEmail()) // Assuming email is the document ID
+                .update("isBlocked", newBlockedStatus)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firestore", "User status updated successfully.");
+                    // Refresh the user lists after blocking/unblocking
+                    fetchAllUsers();
+                    fetchBlockedUsers();
+                })
+                .addOnFailureListener(e -> Log.w("Firestore", "Error updating user status", e));
     }
 
-    private List<User> fetchBlockedUsers() {
-        // Dummy method to simulate fetching blocked users from a database
-        return new ArrayList<>(); // Replace with actual data fetching
+    @Override
+    public void onUnblockUser(User user) {
+
     }
 }

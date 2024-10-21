@@ -1,24 +1,24 @@
 package com.example.qbyte;
 
 public class User {
-    private String id; // Add other user attributes as needed
     private String name;
-    private boolean isBlocked; // To determine if the user is blocked
+    private String email;
+    private boolean isBlocked;
 
     // Constructor
-    public User(String id, String name, boolean isBlocked) {
-        this.id = id;
+    public User(String name, String email, boolean isBlocked) {
         this.name = name;
+        this.email = email;
         this.isBlocked = isBlocked;
     }
 
     // Getters
-    public String getId() {
-        return id;
-    }
-
     public String getName() {
         return name;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public boolean isBlocked() {

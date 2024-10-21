@@ -5,11 +5,45 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/userNameTextView"
-        android:layout_width="wrap_content"
+    <!-- Horizontal layout to display user info and block icon side by side -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:textColor="@color/black" />
+        android:orientation="horizontal">
+
+        <!-- User Info (Name and Email) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/user_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/user_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+
+        <!-- Block Icon to the right -->
+        <ImageView
+            android:id="@+id/block_user_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/block_icon"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Block User" />
+
+    </LinearLayout>
 
 </LinearLayout>

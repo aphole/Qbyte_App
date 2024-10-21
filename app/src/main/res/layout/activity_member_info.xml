@@ -39,18 +39,36 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:layout_height="50dp"
         android:layout_below="@id/title"
         android:layout_marginTop="20dp"
+        app:tabIndicator="@drawable/tab_indicator"
         app:tabIndicatorColor="@color/orange"
-        app:tabSelectedTextColor="@color/black"
-        app:tabTextColor="@color/black" />
+        app:tabIndicatorHeight="50dp"
+        app:tabSelectedTextColor="@color/white"
+        app:tabTextColor="@color/black"
+        app:tabIndicatorAnimationMode="elastic">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Blocked"/>
+
+    </com.google.android.material.tabs.TabLayout>
+
 
     <!-- RecyclerView for User List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="30dp"
         android:layout_below="@id/tabLayout"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="20dp" />

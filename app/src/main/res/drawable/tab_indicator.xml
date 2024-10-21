@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/orange" /> <!-- Set your desired color here -->
+    <size android:height="4dp" /> <!-- Set the height of the indicator -->
+    <corners android:radius="10dp"/>
+</shape>
