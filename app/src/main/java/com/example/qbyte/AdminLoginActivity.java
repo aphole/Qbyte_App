@@ -77,7 +77,7 @@ public class AdminLoginActivity extends AppCompatActivity {
                             assert user != null;
 
                             // Retrieve user document from Firestore to check role
-                            db.collection("users").document(user.getUid())
+                            db.collection("admin").document(user.getUid())
                                     .get()
                                     .addOnCompleteListener(task1 -> {
                                         if (task1.isSuccessful()) {
