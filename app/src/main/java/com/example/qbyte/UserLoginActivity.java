@@ -9,7 +9,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,9 +16,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.Objects;
 
 public class UserLoginActivity extends AppCompatActivity {
 
@@ -27,86 +26,82 @@ public class UserLoginActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     EditText editTextEmail, editTextPassword;
     ProgressBar progressBar;
-    FirebaseFirestore db;  // Firestore instance
+    FirebaseFirestore db; // Firestore instance
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_login);
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance(); // Initialize Firestore
+
         buttonLogin = findViewById(R.id.loginButton);
         editTextEmail = findViewById(R.id.emailInput);
         editTextPassword = findViewById(R.id.passwordInput);
         progressBar = findViewById(R.id.progress_Bar);
-        progressBar.setVisibility(View.GONE);
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                progressBar.setVisibility(View.VISIBLE);
-                String email = editTextEmail.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
+        buttonLogin.setOnClickListener(v -> {
+            progressBar.setVisibility(View.VISIBLE);
+            String email = editTextEmail.getText().toString();
+            String password = editTextPassword.getText().toString();
 
-                if (TextUtils.isEmpty(email)) {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(UserLoginActivity.this, "Enter email", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (TextUtils.isEmpty(password)) {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(UserLoginActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                // Authenticate with Firebase
-                mAuth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                progressBar.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    // Sign in success, check user role
-                                    checkUserRole(Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
-                                } else {
-                                    Toast.makeText(UserLoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
+            if (TextUtils.isEmpty(email)) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(UserLoginActivity.this, "Enter email", Toast.LENGTH_SHORT).show();
+                return;
             }
-        });
-    }
 
-    private void checkUserRole(String userId) {
-        db.collection("users").document(userId).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        if (task.getResult().exists()) {
-                            Boolean isAdmin = task.getResult().getBoolean("isAdmin");
-                            if (isAdmin != null && isAdmin) {
-                                // Show toast for admin login and redirect
-                                Toast.makeText(UserLoginActivity.this, "This account is for admin use.", Toast.LENGTH_SHORT).show();
-                                // Add a slight delay to ensure the user sees the toast before redirecting
-                                progressBar.postDelayed(() -> {
-                                    Intent intent = new Intent(UserLoginActivity.this, StartActivity.class);
-                                    startActivity(intent);
-                                    finish();
-                                }, 1000);  // 1 second delay
-                            } else {
-                                // User is a regular user, redirect to User Dashboard
-                                Intent intent = new Intent(UserLoginActivity.this, UserDashboardActivity.class);
-                                startActivity(intent);
-                                finish();
-                            }
+            if (TextUtils.isEmpty(password)) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(UserLoginActivity.this, "Enter password", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Firebase Authentication for User Login
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        progressBar.setVisibility(View.GONE);
+                        if (task.isSuccessful()) {
+                            // Sign-in success, check if the user is blocked
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            assert user != null;
+
+                            db.collection("users").document(user.getUid())
+                                    .get()
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            DocumentSnapshot document = task1.getResult();
+                                            if (document != null && document.exists()) {
+                                                Boolean isBlocked = document.getBoolean("isBlocked");
+
+                                                if (isBlocked != null && isBlocked) {
+                                                    // User is blocked
+                                                    Toast.makeText(UserLoginActivity.this, "Your account is blocked. Please contact support.", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(getApplicationContext(), BlockedUserActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                } else {
+                                                    // User is not blocked, proceed to User Dashboard
+                                                    Toast.makeText(UserLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
+                                                    Intent intent = new Intent(getApplicationContext(), UserDashboardActivity.class);
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+                                            } else {
+                                                // No user data found
+                                                Toast.makeText(UserLoginActivity.this, "User data not found.", Toast.LENGTH_SHORT).show();
+                                            }
+                                        } else {
+                                            // Firestore retrieval failed
+                                            Toast.makeText(UserLoginActivity.this, "Error retrieving user data.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                         } else {
-                            Toast.makeText(UserLoginActivity.this, "User does not exist.", Toast.LENGTH_SHORT).show();
+                            // If sign-in fails
+                            Toast.makeText(UserLoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(UserLoginActivity.this, "Failed to get user data.", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    });
+        });
     }
 }

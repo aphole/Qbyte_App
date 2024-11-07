@@ -24,4 +24,9 @@ public class User {
     public boolean isBlocked() {
         return isBlocked;
     }
+
+    // Setter for isBlocked
+    public void setBlocked(boolean isBlocked) {
+        this.isBlocked = isBlocked;
+    }
 }

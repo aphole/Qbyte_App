@@ -21,4 +21,6 @@
     <string name="account_information">Account Information</string>
     <string name="date">Account Created: October 10, 2024</string>
     <string name="members_information">Members Information</string>
+    <string name="blocked_message">Your account is blocked. Please contact support.</string>
+    <string name="blocked">Blocked</string>
 </resources>

@@ -2,12 +2,16 @@ package com.example.qbyte;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -38,7 +42,6 @@ public class UserAccountActivity extends AppCompatActivity {
         // Set initial user data (from Firebase Authentication)
         setUserData();
 
-
         // Set onClickListener for logout button
         logoutButton.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
@@ -58,14 +61,18 @@ public class UserAccountActivity extends AppCompatActivity {
 
             // Convert creation timestamp to Date
             long creationTimestamp = user.getMetadata().getCreationTimestamp();
-            Date creationDate = new Date(creationTimestamp);
+            if (creationTimestamp != 0) { // Check if the timestamp is valid
+                Date creationDate = new Date(creationTimestamp);
 
-            // Format the Date to show Day, Month, and Year
-            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy", Locale.getDefault());
-            String formattedDate = dateFormat.format(creationDate);
+                // Format the Date to show Day, Month, and Year
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd yyyy", Locale.getDefault());
+                String formattedDate = dateFormat.format(creationDate);
 
-            // Set account creation date
-            accountCreatedDate.setText("Account Created: " + formattedDate);
+                // Set account creation date
+                accountCreatedDate.setText("Account Created: " + formattedDate);
+            } else {
+                accountCreatedDate.setText("Account Created: Unknown");
+            }
 
             // Fetch additional user data from Firestore
             String uid = user.getUid();
@@ -74,11 +81,19 @@ public class UserAccountActivity extends AppCompatActivity {
                     // Set full name from Firestore
                     String name = documentSnapshot.getString("fullName");
                     fullName.setText("Full Name: " + name);
+                } else {
+                    fullName.setText("Full Name: Unknown");
                 }
             }).addOnFailureListener(e -> {
-                // Handle any errors here
+                Log.e("UserAccountActivity", "Error getting user data", e);
                 fullName.setText("Full Name: Unknown");
             });
+        } else {
+            Log.e("UserAccountActivity", "No authenticated user found.");
+            // Optionally, you can redirect to login activity if no user is logged in
+            Intent intent = new Intent(UserAccountActivity.this, StartActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 }

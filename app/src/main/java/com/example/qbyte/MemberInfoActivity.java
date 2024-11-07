@@ -3,6 +3,7 @@ package com.example.qbyte;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -65,10 +66,12 @@ public class MemberInfoActivity extends AppCompatActivity implements UserAdapter
             }
 
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
 
             @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            public void onTabReselected(TabLayout.Tab tab) {
+            }
         });
     }
 
@@ -85,8 +88,12 @@ public class MemberInfoActivity extends AppCompatActivity implements UserAdapter
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String name = document.getString("name");
                         String email = document.getString("email");
-                        boolean isBlocked = document.getBoolean("isBlocked") != null && document.getBoolean("isBlocked");
-                        allUsers.add(new User(name, email, isBlocked));
+                        Boolean isBlocked = document.getBoolean("isBlocked");
+
+                        // Only add users to allUsers if they are not blocked
+                        if (isBlocked == null || !isBlocked) {
+                            allUsers.add(new User(name, email, false));
+                        }
                     }
 
                     // Update the adapter if "All Users" tab is active
@@ -95,6 +102,7 @@ public class MemberInfoActivity extends AppCompatActivity implements UserAdapter
                     }
                 });
     }
+
 
     private void fetchBlockedUsers() {
         db.collection("users")
@@ -109,8 +117,10 @@ public class MemberInfoActivity extends AppCompatActivity implements UserAdapter
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                         String name = document.getString("name");
                         String email = document.getString("email");
-                        boolean isBlocked = document.getBoolean("isBlocked") != null && document.getBoolean("isBlocked");
-                        if (isBlocked) {
+                        Boolean isBlocked = document.getBoolean("isBlocked");
+
+                        // Only add users to blockedUsers if they are blocked
+                        if (isBlocked != null && isBlocked) {
                             blockedUsers.add(new User(name, email, true));
                         }
                     }
@@ -122,26 +132,66 @@ public class MemberInfoActivity extends AppCompatActivity implements UserAdapter
                 });
     }
 
+
     // Implement the onBlockUser method from OnUserBlockListener
     @Override
     public void onBlockUser(User user) {
-        // Logic to block/unblock user
-        boolean newBlockedStatus = !user.isBlocked(); // Toggle the blocked status
-        // Update Firestore document for the user here
+        // Query the user document by email
         db.collection("users")
-                .document(user.getEmail()) // Assuming email is the document ID
-                .update("isBlocked", newBlockedStatus)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("Firestore", "User status updated successfully.");
-                    // Refresh the user lists after blocking/unblocking
-                    fetchAllUsers();
-                    fetchBlockedUsers();
-                })
-                .addOnFailureListener(e -> Log.w("Firestore", "Error updating user status", e));
+                .whereEqualTo("email", user.getEmail())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        String documentId = task.getResult().getDocuments().get(0).getId(); // Get the document ID
+                        db.collection("users").document(documentId)
+                                .update("isBlocked", true)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "User successfully blocked.", Toast.LENGTH_SHORT).show();
+                                    // Update your user lists...
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Error blocking user.", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(this, "User not found.", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
     public void onUnblockUser(User user) {
+        // Query the user document by email
+        db.collection("users")
+                .whereEqualTo("email", user.getEmail())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful() && !task.getResult().isEmpty()) {
+                        String documentId = task.getResult().getDocuments().get(0).getId(); // Get the document ID
+                        db.collection("users").document(documentId)
+                                .update("isBlocked", false)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(this, "User successfully unblocked.", Toast.LENGTH_SHORT).show();
+                                    // Update your user lists...
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(this, "Error unblocking user.", Toast.LENGTH_SHORT).show();
+                                });
+                    } else {
+                        Toast.makeText(this, "User not found.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
+    /**
+     * Helper method to refresh the displayed user list based on the currently selected tab.
+     */
+    private void updateDisplayedUserList() {
+        if (tabLayout.getSelectedTabPosition() == 0) {
+            // Display all users when the "All Users" tab is active
+            userAdapter.updateUserList(allUsers);
+        } else if (tabLayout.getSelectedTabPosition() == 1) {
+            // Display blocked users when the "Blocked Users" tab is active
+            userAdapter.updateUserList(blockedUsers);
+        }
     }
 }

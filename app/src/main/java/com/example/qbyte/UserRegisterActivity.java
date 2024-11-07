@@ -80,6 +80,7 @@ public class UserRegisterActivity extends AppCompatActivity {
                                         userData.put("fullName", name);
                                         userData.put("email", email);
                                         userData.put("isAdmin", false);  // Mark as a regular user
+                                        userData.put("isBlocked", false); // Default to false when registering a new user
 
                                         // Store the user's data in Firestore
                                         assert newUser != null;
