@@ -6,14 +6,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.qbyte.AdminDashboardActivity;
-import com.example.qbyte.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -27,8 +25,7 @@ public class AdminRegisterActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private EditText adminName, emailInput, passwordInput, confirmPass;
     private Button adminRegisterBtn;
-
-    TextView adminLogin;
+    private TextView adminLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,14 +74,14 @@ public class AdminRegisterActivity extends AppCompatActivity {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Sign in success
                         FirebaseUser user = auth.getCurrentUser();
 
-                        // Store the full name and admin status in Firestore
+                        // Store the full name, admin status, and approval status in Firestore
                         Map<String, Object> adminData = new HashMap<>();
                         adminData.put("fullName", name);
                         adminData.put("email", email);
                         adminData.put("isAdmin", true); // Indicate this user is an admin
+                        adminData.put("isApproved", false); // Admin approval status
 
                         assert user != null;
                         db.collection("admin")
@@ -92,17 +89,21 @@ public class AdminRegisterActivity extends AppCompatActivity {
                                 .set(adminData)
                                 .addOnSuccessListener(aVoid -> {
                                     Log.d("Firestore", "Admin data successfully written!");
-                                    // Redirect to the admin dashboard or another activity
-                                    Intent intent = new Intent(getApplicationContext(), AdminLoginActivity.class);
+
+                                    // Show a message to inform the user about approval requirement
+                                    Toast.makeText(this, "Registration successful! Your account is under review.", Toast.LENGTH_LONG).show();
+
+                                    // Sign out the user and redirect to AccountReviewActivity
+                                    auth.signOut();
+                                    Intent intent = new Intent(getApplicationContext(), AccountReviewActivity.class);
                                     startActivity(intent);
                                     finish();
                                 })
                                 .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
                     } else {
-                        // If sign in fails, display a message to the user.
                         Log.w("FirebaseAuth", "createUserWithEmail:failure", task.getException());
+                        Toast.makeText(this, "Registration failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }
-
 }

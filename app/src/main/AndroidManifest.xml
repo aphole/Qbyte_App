@@ -13,6 +13,9 @@
         android:theme="@style/Theme.QByte"
         tools:targetApi="31">
         <activity
+            android:name=".AccountReviewActivity"
+            android:exported="false" />
+        <activity
             android:name=".BlockedUserActivity"
             android:exported="false" />
         <activity
