@@ -1,5 +1,4 @@
 ---currently on-going project
 
 
-A Capstone Project that can control a door lock through smart phone.
-has a user management. can block and unblock a user.
+"A capstone project that allows control of a door lock through a smartphone, includes user management, and enables blocking and unblocking of users."
