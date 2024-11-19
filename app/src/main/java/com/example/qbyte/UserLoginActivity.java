@@ -41,6 +41,13 @@ public class UserLoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.passwordInput);
         progressBar = findViewById(R.id.progress_Bar);
 
+        // Check if the user is already signed in when the activity is started
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            // If user is already signed in, navigate to the dashboard
+            navigateToDashboard();
+        }
+
         buttonLogin.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
             String email = editTextEmail.getText().toString();
@@ -84,9 +91,7 @@ public class UserLoginActivity extends AppCompatActivity {
                                                 } else {
                                                     // User is not blocked, proceed to User Dashboard
                                                     Toast.makeText(UserLoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(getApplicationContext(), UserDashboardActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
+                                                    navigateToDashboard();
                                                 }
                                             } else {
                                                 // No user data found
@@ -103,5 +108,12 @@ public class UserLoginActivity extends AppCompatActivity {
                         }
                     });
         });
+    }
+
+    // Method to navigate to the dashboard if the user is already signed in
+    private void navigateToDashboard() {
+        Intent intent = new Intent(UserLoginActivity.this, UserDashboardActivity.class);
+        startActivity(intent);
+        finish();  // Close the LoginActivity to prevent user from coming back to it
     }
 }

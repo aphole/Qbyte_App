@@ -45,10 +45,12 @@
         android:layout_width="312dp"
         android:layout_height="50dp"
         android:hint="@string/email"
+        android:inputType="textEmailAddress"
         android:layout_below="@+id/userLogo"
         android:layout_centerHorizontal="true"
         android:background="@drawable/input_bg"
         android:layout_marginTop="45dp"
+        android:autofillHints="email"
         />
 
     <EditText

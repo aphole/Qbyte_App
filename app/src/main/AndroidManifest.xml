@@ -13,6 +13,15 @@
         android:theme="@style/Theme.QByte"
         tools:targetApi="31">
         <activity
+            android:name=".ActivityLogsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserLogsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".UserActivityLogs"
+            android:exported="false" />
+        <activity
             android:name=".AccountReviewActivity"
             android:exported="false" />
         <activity

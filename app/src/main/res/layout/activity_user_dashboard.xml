@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/ash"
-    tools:context=".AdminDashboardActivity">
+    tools:context=".UserDashboardActivity">
 
     <ImageView
         android:layout_width="match_parent"
@@ -32,24 +32,14 @@
         android:layout_below="@id/qbyteLogo"
         android:layout_marginTop="20dp"/>
 
-    <!-- User Details -->
-    <TextView
-        android:id="@+id/user_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello User"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@id/aboutUs"
-        android:layout_marginTop="50dp"
-        android:textSize="18sp"
-        />
+
 
     <!-- Switch -->
   <androidx.appcompat.widget.SwitchCompat
       android:id="@+id/switchButton"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_below="@id/user_details"
+      android:layout_below="@id/aboutUs"
       android:layout_marginTop="80dp"
       android:layout_centerHorizontal="true"
       android:thumb="@drawable/thumb"
@@ -62,17 +52,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="100dp"
         android:layout_below="@id/switchButton"
-        android:padding="5dp"
+        android:padding="25dp"
         android:layout_gravity="center"
         app:alignmentMode="alignMargins"
         app:orientation="horizontal"
         app:rowCount="1"
-        app:columnCount="3">
+        app:columnCount="2">
 
         <!-- Module 1 -->
         <androidx.cardview.widget.CardView
             android:id="@+id/module_user_info"
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             app:cardCornerRadius="20dp"
@@ -83,6 +73,7 @@
                 android:layout_height="130dp"
                 android:orientation="vertical"
                 android:gravity="center"
+                android:padding="6dp"
                 android:background="@drawable/module_bg">
 
                 <ImageView
@@ -103,40 +94,8 @@
 
         <!-- Module 2 -->
         <androidx.cardview.widget.CardView
-            android:id="@+id/module_notification"
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="20dp"
-            app:layout_columnWeight="1">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="130dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:background="@drawable/module_bg">
-
-                <ImageView
-                    android:layout_width="85dp"
-                    android:layout_height="70.5dp"
-                    android:src="@drawable/notif_icon" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Notification"
-                    android:textSize="16sp"
-                    android:gravity="center"
-                    android:textColor="@android:color/black" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- Module 2 -->
-        <androidx.cardview.widget.CardView
             android:id="@+id/module_activity_log"
-            android:layout_width="20dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             app:cardCornerRadius="20dp"
@@ -147,6 +106,7 @@
                 android:layout_height="130dp"
                 android:orientation="vertical"
                 android:gravity="center"
+                android:padding="6dp"
                 android:background="@drawable/module_bg">
 
                 <ImageView
