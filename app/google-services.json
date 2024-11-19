@@ -1,1 +1,33 @@
+<<<<<<< Updated upstream
 // add you database details here
+=======
+{
+  "project_info": {
+    "project_number": "907449495629",
+    "project_id": "qbyte-app-66e48",
+    "storage_bucket": "qbyte-app-66e48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907449495629:android:7d828e79245af576196c04",
+        "android_client_info": {
+          "package_name": "com.example.qbyte"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAdaAg8x6jfP754jHvr2tFfX7TOATq3ncQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
+>>>>>>> Stashed changes
