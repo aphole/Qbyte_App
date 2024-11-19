@@ -1,9 +1,7 @@
-<<<<<<< Updated upstream
-// add you database details here
-=======
 {
   "project_info": {
     "project_number": "907449495629",
+    "firebase_url": "https://qbyte-app-66e48-default-rtdb.firebaseio.com",
     "project_id": "qbyte-app-66e48",
     "storage_bucket": "qbyte-app-66e48.firebasestorage.app"
   },
@@ -30,4 +28,3 @@
   ],
   "configuration_version": "1"
 }
->>>>>>> Stashed changes

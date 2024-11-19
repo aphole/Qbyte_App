@@ -9,8 +9,11 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.cardview.widget.CardView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -35,10 +38,13 @@ public class UserDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_dashboard);
 
+        // Initialize Firebase instances
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         lockStatusRef = FirebaseDatabase.getInstance().getReference("LockStatus");  // Reference for lock status
         activityLogsRef = FirebaseDatabase.getInstance().getReference("activityLogs");  // Reference for activity logs
+
+        // Link UI components
         activityLogs = findViewById(R.id.module_activity_log); // activity logs module
         userInfo = findViewById(R.id.module_user_info); // user info module
         switchButton = findViewById(R.id.switchButton);
@@ -46,10 +52,10 @@ public class UserDashboardActivity extends AppCompatActivity {
         // Fetch user's full name from Firestore
         fetchUserFullName();
 
-        // Load initial lock status
-        loadLockStatus();
+        // Setup real-time listener for lock status
+        setupLockStatusListener();
 
-        // Listen for switch button state changes
+        // Listen for switch button state changes and update lock status
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> updateLockStatus(isChecked));
 
         // Navigate to UserAccountActivity when clicking user info card
@@ -80,15 +86,27 @@ public class UserDashboardActivity extends AppCompatActivity {
                 });
     }
 
-    private void loadLockStatus() {
-        lockStatusRef.get().addOnSuccessListener(dataSnapshot -> {
-            Integer status = dataSnapshot.getValue(Integer.class);
-            if (status != null) {
-                // Set the switch button to reflect the current lock status (0 for locked, 1 for unlocked)
-                switchButton.setChecked(status == 1);
+    private void setupLockStatusListener() {
+        lockStatusRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Integer status = dataSnapshot.getValue(Integer.class);
+                if (status != null) {
+                    // Reflect the change on the switch button
+                    switchButton.setChecked(status == 1);
+
+                    // Determine the action based on the lock status value
+                    String action = (status == 1) ? "Unlocked" : "Locked";
+
+                    // Log the change in activity logs
+                    logAction(action);
+                }
             }
-        }).addOnFailureListener(e -> {
-            Toast.makeText(UserDashboardActivity.this, "Failed to load lock status.", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(UserDashboardActivity.this, "Error listening to lock status.", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -99,8 +117,6 @@ public class UserDashboardActivity extends AppCompatActivity {
         // Directly update the `lockStatus` value in the database
         lockStatusRef.setValue(lockStatusValue)
                 .addOnSuccessListener(aVoid -> {
-                    // Log the action in activity logs
-                    logAction(action);
                     Toast.makeText(UserDashboardActivity.this, "Lock status updated.", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> Toast.makeText(UserDashboardActivity.this, "Failed to update lock status.", Toast.LENGTH_SHORT).show());
@@ -113,7 +129,7 @@ public class UserDashboardActivity extends AppCompatActivity {
         // Create a new log entry with details
         Map<String, Object> logEntry = new HashMap<>();
         logEntry.put("action", action);           // "Locked" or "Unlocked"
-        logEntry.put("fullName", fullname);        // User who made the change
+        logEntry.put("fullName", fullname != null ? fullname : "RFID/Keypad");  // User who made the change
         logEntry.put("device", "Mobile");          // Current device
         logEntry.put("timestamp", timestamp);      // Date and time of the action
 
