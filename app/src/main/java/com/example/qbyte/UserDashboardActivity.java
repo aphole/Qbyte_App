@@ -54,7 +54,10 @@ public class UserDashboardActivity extends AppCompatActivity {
         setupLockStatusListener();
 
         // Listen for switch button state changes
-        switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> updateLockStatus(isChecked));
+        switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            // Update the lock status directly
+            updateLockStatus(isChecked);
+        });
 
         // Navigate to UserAccountActivity when clicking user info card
         userInfo.setOnClickListener(v -> {
@@ -71,23 +74,31 @@ public class UserDashboardActivity extends AppCompatActivity {
         lockStatusRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Integer status = dataSnapshot.getValue(Integer.class);
-                if (status != null) {
-                    // Update switch state without triggering an update
-                    switchButton.setOnCheckedChangeListener(null); // Remove listener temporarily
-                    switchButton.setChecked(status == 1);
-                    switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> updateLockStatus(isChecked)); // Reattach listener
+                Integer lockstatus = dataSnapshot.getValue(Integer.class);  // Read the lock status
 
-                    // Determine the action
-                    String action = (status == 1) ? "Unlocked" : "Locked";
+                if (lockstatus != null) {
+                    boolean isUnlocked = lockstatus == 1;
 
-                    // Log the action only if the change wasn't triggered by the app
-                    if (!isAppTriggeredChange) {
-                        logAction(action);
+                    // Update switch state only if necessary
+                    if (switchButton.isChecked() != isUnlocked) {
+                        // Temporarily remove listener to avoid recursion
+                        lockStatusRef.removeEventListener(this);
+
+                        // Set the switch state
+                        switchButton.setChecked(isUnlocked);
+
+                        // Log the action
+                        String action = isUnlocked ? "Unlocked" : "Locked";
+                        if (!isAppTriggeredChange) {
+                            logAction(action);
+                        }
+
+                        // Reset the app-triggered flag
+                        isAppTriggeredChange = false;
+
+                        // Reattach the listener
+                        lockStatusRef.addValueEventListener(this);
                     }
-
-                    // Reset the flag after handling the change
-                    isAppTriggeredChange = false;
                 }
             }
 
@@ -100,15 +111,17 @@ public class UserDashboardActivity extends AppCompatActivity {
 
     private void updateLockStatus(boolean isChecked) {
         int lockStatusValue = isChecked ? 1 : 0;  // 1 for unlocked, 0 for locked
-        String action = isChecked ? "Unlocked" : "Locked";  // Action text
+        String action = isChecked ? "Unlocked" : "Locked";
 
         // Set the flag to indicate this change was triggered by the app
         isAppTriggeredChange = true;
 
-        // Update the `lockStatus` in the database
+        // Update the database
         lockStatusRef.setValue(lockStatusValue)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(UserDashboardActivity.this, "Lock status updated.", Toast.LENGTH_SHORT).show();
+                    // Log the action manually
+                    logAction(action);
                 })
                 .addOnFailureListener(e -> Toast.makeText(UserDashboardActivity.this, "Failed to update lock status.", Toast.LENGTH_SHORT).show());
     }
@@ -120,9 +133,8 @@ public class UserDashboardActivity extends AppCompatActivity {
         // Create a new log entry with details
         Map<String, Object> logEntry = new HashMap<>();
         logEntry.put("action", action);           // "Locked" or "Unlocked"
-        logEntry.put("fullName", fullname);        // User who made the change
-        logEntry.put("device", "Mobile");          // Current device
-        logEntry.put("timestamp", timestamp);      // Date and time of the action
+        logEntry.put("fullName", fullname);       // User who made the change
+        logEntry.put("timestamp", timestamp);     // Date and time of the action
 
         // Push a new entry to `activityLogs` to record the action
         activityLogsRef.push().setValue(logEntry)

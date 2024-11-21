@@ -53,8 +53,10 @@ public class AdminDashboardActivity extends AppCompatActivity {
         });
 
         activityLogs.setOnClickListener(v -> {
-            startActivity(new Intent(AdminDashboardActivity.this, ActivityLogsAdapter.class));
+            Intent intent = new Intent(AdminDashboardActivity.this, ActivityLogsActivity.class);
+            startActivity(intent);
         });
+
 
     }
 
