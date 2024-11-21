@@ -13,26 +13,25 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class UserDashboardActivity extends AppCompatActivity {
 
     private CardView userInfo, activityLogs;
     private FirebaseAuth mAuth;
-    private FirebaseFirestore db;
     private DatabaseReference lockStatusRef;
     private DatabaseReference activityLogsRef;
     private SwitchCompat switchButton;
-    private String fullname;
-    private boolean isAppTriggeredChange = false; // Flag to track app-triggered changes
+
+    private boolean isLogPending = false; // Flag to track if the log is pending
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,22 +39,19 @@ public class UserDashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_dashboard);
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
-        lockStatusRef = FirebaseDatabase.getInstance().getReference("LockStatus");  // Reference for lock status
-        activityLogsRef = FirebaseDatabase.getInstance().getReference("activityLogs");  // Reference for activity logs
-        activityLogs = findViewById(R.id.module_activity_log); // activity logs module
-        userInfo = findViewById(R.id.module_user_info); // user info module
+        lockStatusRef = FirebaseDatabase.getInstance().getReference("LockStatus");  // Lock status path
+        activityLogsRef = FirebaseDatabase.getInstance().getReference("activityLogs");  // Activity logs path
+
+        userInfo = findViewById(R.id.module_user_info);
+        activityLogs = findViewById(R.id.module_activity_log);
         switchButton = findViewById(R.id.switchButton);
 
-        // Fetch user's full name from Firestore
-        fetchUserFullName();
-
-        // Setup the lock status listener
+        // Setup the lock status listener for the current user
         setupLockStatusListener();
 
         // Listen for switch button state changes
         switchButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            // Update the lock status directly
+            // Update lock status and log action when switch is toggled
             updateLockStatus(isChecked);
         });
 
@@ -71,34 +67,15 @@ public class UserDashboardActivity extends AppCompatActivity {
     }
 
     private void setupLockStatusListener() {
+        // Listen to lock status changes globally
         lockStatusRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Integer lockstatus = dataSnapshot.getValue(Integer.class);  // Read the lock status
+                Integer lockStatus = dataSnapshot.getValue(Integer.class);
 
-                if (lockstatus != null) {
-                    boolean isUnlocked = lockstatus == 1;
-
-                    // Update switch state only if necessary
-                    if (switchButton.isChecked() != isUnlocked) {
-                        // Temporarily remove listener to avoid recursion
-                        lockStatusRef.removeEventListener(this);
-
-                        // Set the switch state
-                        switchButton.setChecked(isUnlocked);
-
-                        // Log the action
-                        String action = isUnlocked ? "Unlocked" : "Locked";
-                        if (!isAppTriggeredChange) {
-                            logAction(action);
-                        }
-
-                        // Reset the app-triggered flag
-                        isAppTriggeredChange = false;
-
-                        // Reattach the listener
-                        lockStatusRef.addValueEventListener(this);
-                    }
+                if (lockStatus != null) {
+                    // Update the switch based on the lock status from Firebase
+                    switchButton.setChecked(lockStatus == 1);
                 }
             }
 
@@ -110,51 +87,64 @@ public class UserDashboardActivity extends AppCompatActivity {
     }
 
     private void updateLockStatus(boolean isChecked) {
-        int lockStatusValue = isChecked ? 1 : 0;  // 1 for unlocked, 0 for locked
-        String action = isChecked ? "Unlocked" : "Locked";
+        // Check if log is already pending
+        if (isLogPending) {
+            return;  // Skip if log is already pending
+        }
 
-        // Set the flag to indicate this change was triggered by the app
-        isAppTriggeredChange = true;
+        // Set the lock status in Firebase (0 for locked, 1 for unlocked)
+        int lockStatusValue = isChecked ? 1 : 0;
 
-        // Update the database
-        lockStatusRef.setValue(lockStatusValue)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(UserDashboardActivity.this, "Lock status updated.", Toast.LENGTH_SHORT).show();
-                    // Log the action manually
-                    logAction(action);
-                })
-                .addOnFailureListener(e -> Toast.makeText(UserDashboardActivity.this, "Failed to update lock status.", Toast.LENGTH_SHORT).show());
+        // Set a flag indicating that a log creation is pending
+        isLogPending = true;
+
+        // Use Firebase transaction to ensure atomicity of lock status change
+        lockStatusRef.runTransaction(new Transaction.Handler() {
+            @Override
+            public Transaction.Result doTransaction(MutableData mutableData) {
+                // If lockStatus is already set, don't make any changes
+                if (mutableData.getValue() != null) {
+                    return Transaction.success(mutableData);
+                }
+
+                // Update the lock status
+                mutableData.setValue(lockStatusValue);
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot currentData) {
+                if (committed) {
+                    // Successfully set lock status
+                    logAction(isChecked ? "Unlocked" : "Locked");
+
+                    // Reset the flag after logging
+                    isLogPending = false;
+                } else {
+                    // Error setting lock status
+                    Toast.makeText(UserDashboardActivity.this, "Failed to update lock status.", Toast.LENGTH_SHORT).show();
+                    isLogPending = false;
+                }
+            }
+        });
     }
 
     private void logAction(String action) {
         // Get the current date and time
         String timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
 
+        // Get the current user ID (the user who triggered the action)
+        String currentUserId = mAuth.getCurrentUser().getUid();
+
         // Create a new log entry with details
         Map<String, Object> logEntry = new HashMap<>();
-        logEntry.put("action", action);           // "Locked" or "Unlocked"
-        logEntry.put("fullName", fullname);       // User who made the change
-        logEntry.put("timestamp", timestamp);     // Date and time of the action
+        logEntry.put("action", action);              // Action (locked or unlocked)
+        logEntry.put("userId", currentUserId); // User ID of the person who triggered the action
+        logEntry.put("timestamp", timestamp);       // Date and time of the action
 
-        // Push a new entry to `activityLogs` to record the action
+        // Push a new entry to the activityLogs path to record the action
         activityLogsRef.push().setValue(logEntry)
                 .addOnFailureListener(e -> Toast.makeText(UserDashboardActivity.this, "Failed to log action.", Toast.LENGTH_SHORT).show());
     }
-
-    private void fetchUserFullName() {
-        String userId = Objects.requireNonNull(mAuth.getCurrentUser()).getUid();
-        db.collection("users").document(userId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        fullname = documentSnapshot.getString("fullName");
-                        if (fullname == null) {
-                            fullname = "Unknown User";
-                        }
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(UserDashboardActivity.this, "Error fetching user data.", Toast.LENGTH_SHORT).show();
-                });
-    }
 }
+
