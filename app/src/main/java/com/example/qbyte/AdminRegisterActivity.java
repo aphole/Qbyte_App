@@ -2,6 +2,7 @@ package com.example.qbyte;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -49,12 +50,7 @@ public class AdminRegisterActivity extends AppCompatActivity {
             finish();
         });
 
-        adminRegisterBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                registerAdmin();
-            }
-        });
+        adminRegisterBtn.setOnClickListener(v -> registerAdmin());
     }
 
     private void registerAdmin() {
@@ -98,6 +94,13 @@ public class AdminRegisterActivity extends AppCompatActivity {
                                     Intent intent = new Intent(getApplicationContext(), AccountReviewActivity.class);
                                     startActivity(intent);
                                     finish();
+
+                                    // Add a delay before redirecting to AdminRegisterActivity again
+                                    new Handler().postDelayed(() -> {
+                                        Intent redirectIntent = new Intent(AdminRegisterActivity.this, AdminRegisterActivity.class);
+                                        startActivity(redirectIntent);
+                                        finish(); // Optionally finish the current activity
+                                    }, 3000); // 3 seconds delay
                                 })
                                 .addOnFailureListener(e -> Log.w("Firestore", "Error writing document", e));
                     } else {

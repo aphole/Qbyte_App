@@ -2,20 +2,16 @@ package com.example.qbyte;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -28,7 +24,7 @@ public class AdminLoginActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     EditText editTextEmail, editTextPassword;
     ProgressBar progressBar;
-    FirebaseFirestore db; // Firestore instance to check admin role
+    FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +32,7 @@ public class AdminLoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin_login);
 
         mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance(); // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
 
         textView = findViewById(R.id.registerNow);
         buttonLogin = findViewById(R.id.adminLoginButton);
@@ -44,14 +40,12 @@ public class AdminLoginActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.adminPass);
         progressBar = findViewById(R.id.progressBar);
 
-        // Redirect to Admin Registration
         textView.setOnClickListener(v -> {
             Intent intent = new Intent(getApplicationContext(), AdminRegisterActivity.class);
             startActivity(intent);
             finish();
         });
 
-        // Login Button Click Listener
         buttonLogin.setOnClickListener(v -> {
             progressBar.setVisibility(View.VISIBLE);
             String email = editTextEmail.getText().toString();
@@ -67,16 +61,13 @@ public class AdminLoginActivity extends AppCompatActivity {
                 return;
             }
 
-            // Firebase Authentication for Admin Login
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         progressBar.setVisibility(View.GONE);
                         if (task.isSuccessful()) {
-                            // Sign-in success, now check if the user is an admin
                             FirebaseUser user = mAuth.getCurrentUser();
                             assert user != null;
 
-                            // Retrieve user document from Firestore to check role
                             db.collection("admin").document(user.getUid())
                                     .get()
                                     .addOnCompleteListener(task1 -> {
@@ -84,34 +75,45 @@ public class AdminLoginActivity extends AppCompatActivity {
                                             DocumentSnapshot document = task1.getResult();
                                             if (document != null && document.exists()) {
                                                 Boolean isAdmin = document.getBoolean("isAdmin");
+                                                Boolean isApproved = document.getBoolean("isApproved");
 
                                                 if (isAdmin != null && isAdmin) {
-                                                    // User is an admin, proceed to Admin Dashboard
-                                                    Toast.makeText(AdminLoginActivity.this, "Admin Login Successful", Toast.LENGTH_SHORT).show();
-                                                    Intent intent = new Intent(getApplicationContext(), AdminDashboardActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
+                                                    if (isApproved != null && isApproved) {
+                                                        // Redirect to Admin Dashboard
+                                                        Toast.makeText(AdminLoginActivity.this, "Login successful!", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(getApplicationContext(), AdminDashboardActivity.class);
+                                                        startActivity(intent);
+                                                        finish();
+                                                    } else {
+                                                        // Redirect to AccountReviewActivity
+                                                        Toast.makeText(this, "Account not approved. Redirecting for review...", Toast.LENGTH_SHORT).show();
+                                                        Intent intent = new Intent(getApplicationContext(), AccountReviewActivity.class);
+                                                        startActivity(intent);
+                                                        finish();
+
+                                                        // Add a delay before redirecting back to login
+                                                        new Handler().postDelayed(() -> {
+                                                            Intent redirectIntent = new Intent(AdminLoginActivity.this, AdminLoginActivity.class);
+                                                            startActivity(redirectIntent);
+                                                            finish();
+                                                        }, 3000); // 3 seconds delay
+                                                    }
                                                 } else {
-                                                    // User is not an admin, show error
-                                                    Toast.makeText(AdminLoginActivity.this, "Access Denied. Not an Admin.", Toast.LENGTH_SHORT).show();
-                                                    FirebaseAuth.getInstance().signOut(); // Sign out the non-admin user
+                                                    Toast.makeText(this, "Access Denied. Not an Admin.", Toast.LENGTH_SHORT).show();
+                                                    mAuth.signOut();
                                                     Intent intent = new Intent(getApplicationContext(), StartActivity.class);
                                                     startActivity(intent);
                                                     finish();
                                                 }
                                             } else {
-                                                // No user data found
-                                                Toast.makeText(AdminLoginActivity.this, "User data not found.", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(this, "User data not found.", Toast.LENGTH_SHORT).show();
                                             }
                                         } else {
-                                            // Firestore retrieval failed
-                                            Toast.makeText(AdminLoginActivity.this, "Error retrieving user data.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(this, "Error retrieving user data.", Toast.LENGTH_SHORT).show();
                                         }
                                     });
-
                         } else {
-                            // If sign-in fails
-                            Toast.makeText(AdminLoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     });
         });
